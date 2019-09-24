@@ -21,7 +21,7 @@
 
 int main() {
     int sock_fd;
-    struct sockaddr_in servaddr, cliaddr;
+    struct sockaddr_in serve_addr, cli_addr;
 
     struct Message *temp = malloc(sizeof(struct Message));
 
@@ -31,31 +31,36 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    memset(&servaddr, 0, sizeof(servaddr));
-    memset(&cliaddr, 0, sizeof(cliaddr));
+    memset(&serve_addr, 0, sizeof(serve_addr));
+    memset(&cli_addr, 0, sizeof(cli_addr));
 
     /* Filling server information */
-    servaddr.sin_family = AF_INET; // IPv4
-    servaddr.sin_addr.s_addr = INADDR_ANY;
-    servaddr.sin_port = htons(PORT);
+    serve_addr.sin_family = AF_INET; /* IPv4 */
+    serve_addr.sin_addr.s_addr = INADDR_ANY;
+    serve_addr.sin_port = htons(PORT);
 
     /* Bind the socket with the server address */
-    if (bind(sock_fd, (const struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
+    if (bind(sock_fd, (const struct sockaddr *) &serve_addr, sizeof(serve_addr)) < 0) {
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
 
-    unsigned int len = sizeof(cliaddr);
-    recvfrom(sock_fd, temp, sizeof(*temp), MSG_WAITALL, (struct sockaddr *) &cliaddr, &len);
+    printf("Servidor pronto para receber mensgens.\n\n");
 
-    printf("Received: %s\n", temp->message);
+    while (TRUE) {
+        unsigned int len = sizeof(cli_addr);
+        recvfrom(sock_fd, temp, sizeof(*temp), MSG_WAITALL, (struct sockaddr *) &cli_addr, &len);
 
-    /*buffer[n] = '\0';
-
-    printf("Client : %s\n", buffer);
-
-    sendto(sock_fd, (const char *) welcome_message, strlen(welcome_message),
-           MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);*/
-
-    return EXIT_SUCCESS;
+        if (temp->type == NORMAL_TYPE) {
+            printf("[%d:%d:%d, %d/%d/%d] %s: %s \n",
+                   temp->tm.tm_hour, temp->tm.tm_min, temp->tm.tm_sec,
+                   temp->tm.tm_mday, temp->tm.tm_mon + 1, 1900 + temp->tm.tm_year,
+                   temp->sender, temp->text);
+        } else {
+            printf("[%d:%d:%d, %d/%d/%d] %s %s \n",
+                   temp->tm.tm_hour, temp->tm.tm_min, temp->tm.tm_sec,
+                   temp->tm.tm_mday, temp->tm.tm_mon + 1, 1900 + temp->tm.tm_year,
+                   temp->sender, temp->text);
+        }
+    }
 }
