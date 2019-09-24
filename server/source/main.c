@@ -23,7 +23,7 @@ int main() {
     int sock_fd;
     struct sockaddr_in serve_addr, cli_addr;
 
-    struct Message *temp = malloc(sizeof(struct Message));
+    struct Message *message = malloc(sizeof(struct Message));
 
     /* Creating socket file descriptor */
     if ((sock_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -49,18 +49,18 @@ int main() {
 
     while (TRUE) {
         unsigned int len = sizeof(cli_addr);
-        recvfrom(sock_fd, temp, sizeof(*temp), MSG_WAITALL, (struct sockaddr *) &cli_addr, &len);
+        recvfrom(sock_fd, message, sizeof(*message), MSG_WAITALL, (struct sockaddr *) &cli_addr, &len);
 
-        if (temp->type == NORMAL_TYPE) {
+        if (message->type == NORMAL_TYPE) {
             printf("[%d:%d:%d, %d/%d/%d] %s: %s \n",
-                   temp->tm.tm_hour, temp->tm.tm_min, temp->tm.tm_sec,
-                   temp->tm.tm_mday, temp->tm.tm_mon + 1, 1900 + temp->tm.tm_year,
-                   temp->sender, temp->text);
+                   message->tm.tm_hour, message->tm.tm_min, message->tm.tm_sec,
+                   message->tm.tm_mday, message->tm.tm_mon + 1, 1900 + message->tm.tm_year,
+                   message->sender, message->text);
         } else {
             printf("[%d:%d:%d, %d/%d/%d] %s %s \n",
-                   temp->tm.tm_hour, temp->tm.tm_min, temp->tm.tm_sec,
-                   temp->tm.tm_mday, temp->tm.tm_mon + 1, 1900 + temp->tm.tm_year,
-                   temp->sender, temp->text);
+                   message->tm.tm_hour, message->tm.tm_min, message->tm.tm_sec,
+                   message->tm.tm_mday, message->tm.tm_mon + 1, 1900 + message->tm.tm_year,
+                   message->sender, message->text);
         }
     }
 }
