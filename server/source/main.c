@@ -1,4 +1,11 @@
-/* Server side implementation of UDP client-server model */
+/******************************************************************************
+ * Server side implementation of UDP client-server model                      *
+ *                                                                            *
+ * File:    main.c                                                            *
+ * Author:  Samuel Terra Vieira                                               *
+ * Address: Universidade Federal de Lavras                                    *
+ * Date:    Nov/2019                                                          *
+ *****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -8,15 +15,15 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#define PORT     8080
-#define MAX_LINE 1024
+#define PORT 8080
 
-/* Driver code */
+#include "../../lib/message.h"
+
 int main() {
     int sock_fd;
-    char buffer[MAX_LINE];
-    char *welcome_message = "Hello from server";
     struct sockaddr_in servaddr, cliaddr;
+
+    struct Message *temp = malloc(sizeof(struct Message));
 
     /* Creating socket file descriptor */
     if ((sock_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -33,20 +40,22 @@ int main() {
     servaddr.sin_port = htons(PORT);
 
     /* Bind the socket with the server address */
-    if (bind(sock_fd, (const struct sockaddr *) &servaddr,
-             sizeof(servaddr)) < 0) {
+    if (bind(sock_fd, (const struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
 
-    int len, n;
-    n = recvfrom(sock_fd, (char *) buffer, MAX_LINE, MSG_WAITALL,
-                 (struct sockaddr *) &cliaddr, &len);
-    buffer[n] = '\0';
+    unsigned int len = sizeof(cliaddr);
+    recvfrom(sock_fd, temp, sizeof(*temp), MSG_WAITALL, (struct sockaddr *) &cliaddr, &len);
+
+    printf("Received: %s\n", temp->message);
+
+    /*buffer[n] = '\0';
+
     printf("Client : %s\n", buffer);
+
     sendto(sock_fd, (const char *) welcome_message, strlen(welcome_message),
-           MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);
-    printf("Hello message sent.\n");
+           MSG_CONFIRM, (const struct sockaddr *) &cliaddr, len);*/
 
     return EXIT_SUCCESS;
 }
