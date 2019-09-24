@@ -18,12 +18,14 @@
 #define PORT 8080
 
 #include "../../lib/message.h"
+#include "list/list.h"
 
 int main() {
     int sock_fd;
     struct sockaddr_in serve_addr, cli_addr;
 
     struct Message *message = malloc(sizeof(struct Message));
+    List *messages_history = init_list();
 
     /* Creating socket file descriptor */
     if ((sock_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -51,6 +53,8 @@ int main() {
         unsigned int len = sizeof(cli_addr);
         recvfrom(sock_fd, message, sizeof(*message), MSG_WAITALL, (struct sockaddr *) &cli_addr, &len);
 
+        insert_list(&messages_history, *message);
+
         if (message->type == NORMAL_TYPE) {
             printf("[%d:%d:%d, %d/%d/%d] %s: %s \n",
                    message->tm.tm_hour, message->tm.tm_min, message->tm.tm_sec,
@@ -61,6 +65,8 @@ int main() {
                    message->tm.tm_hour, message->tm.tm_min, message->tm.tm_sec,
                    message->tm.tm_mday, message->tm.tm_mon + 1, 1900 + message->tm.tm_year,
                    message->sender, message->text);
+
+            print_list(messages_history);
         }
     }
 }

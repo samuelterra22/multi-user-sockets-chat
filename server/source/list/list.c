@@ -3,15 +3,15 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+
+#include "../../../lib/message.h"
 
 struct tList {
-    int uid;
-    char *name;
+    struct Message message;
     struct tList *next;
 };
 
-void insert_list(List **p, int uid, char *name) {
+void insert_list(List **p, struct Message message) {
     List *current, *new, *previous;
 
     new = (List *) malloc(sizeof(List));
@@ -19,32 +19,27 @@ void insert_list(List **p, int uid, char *name) {
     current = *p;
     previous = NULL;
 
-    new->uid = uid;
-    new->name = malloc(strlen(name) + 1);
-    strcpy(new->name, name);
+    new->message = message;
 
     if (current == NULL) {
         new->next = NULL;
         *p = new;
     } else {
-        while (current != NULL && current->uid < uid) {
+        while (current != NULL) {
             previous = current;
             current = current->next;
         }
+        previous->next = new;
 
-        new->next = current;
-
-        if (previous == NULL) {
-            *p = new;
-        } else {
-            previous->next = new;
-        }
     }
 }
 
 void print_list(List *p) {
     while (p != NULL) {
-        printf("%s %d\n", p->name, p->uid);
+        printf("[%d:%d:%d, %d/%d/%d] %s %s \n",
+               p->message.tm.tm_hour, p->message.tm.tm_min, p->message.tm.tm_sec,
+               p->message.tm.tm_mday, p->message.tm.tm_mon + 1, 1900 + p->message.tm.tm_year,
+               p->message.sender, p->message.text);
         p = p->next;
     }
 }
@@ -53,24 +48,23 @@ void *destroy_list(List *l) {
     List *p = l;
     while (p != NULL) {
         List *t = p->next;
-        free(p->name);
         free(p);
         p = t;
     }
     return NULL;
 }
 
-List *search_in_list(List *list, int uid) {
+List *search_in_list_by_sender(List *list, const char *sender) {
     List *p;
     for (p = list; p != NULL; p = p->next) {
-        if (p->uid == uid) {
+        if (p->message.sender == sender) {
             return p;
         }
     }
     return NULL;
 }
 
-List *remove_in_list(List *list, int uid) {
+List *remove_in_list(List *list, const char *sender) {
     // ponteiro para o elemento anterior
     List *preview = NULL;
 
@@ -78,7 +72,7 @@ List *remove_in_list(List *list, int uid) {
     List *p = list;
 
     // procura o elemento na lista, guardando o anterior
-    while (p != NULL && p->uid != uid) {
+    while (p != NULL && p->message.sender != sender) {
         preview = p;
         p = p->next;
     }
