@@ -55,8 +55,8 @@ dkms.conf
 .idea/*
 
 # Compiled files
-client
-server
+client/client
+server/server
 
 # cmake files debug
 cmake-build-debug/
