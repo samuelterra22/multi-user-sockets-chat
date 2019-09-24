@@ -7,15 +7,19 @@
 #################################################################
 #                     Variable definition                       #
 #################################################################
+SHELL:=/bin/bash
 
 # The project name
 PROJECT_NAME=server
 
+# Object directories recursive
+OBJ_DIRS=$(shell find ./source/ -type d | cut -c 10- | tail -n+2)
+
 # .c folder with files
-C_SOURCE=$(wildcard ./source/*.c)
+C_SOURCE=$(shell find ./source/ -type f -name '*.c')
 
 # .h folder with files
-H_SOURCE=$(wildcard ./source/*.h)
+H_SOURCE=$(shell find ./source/ -type f -name '*.h')
 
 # Object files
 OBJ=$(subst .c,.o,$(subst source,objects,$(C_SOURCE)))
@@ -25,8 +29,8 @@ CC=gcc
 
 # Flags for compiler
 CC_FLAGS=-c         \
-         -W         \
-         -Wall      \
+#         -Wall      \
+#         -W         \
 #         -ansi      \
 #         -pedantic
 
@@ -37,15 +41,17 @@ RM = rm -rf
 #                    Compilation and linking                    #
 #################################################################
 
-all: objFolder $(PROJECT_NAME)
+all: objFolder $(OBJ_DIRS) $(PROJECT_NAME)
 
 $(PROJECT_NAME): $(OBJ)
 	@ echo 'Building binary using GCC linker: $@'
 	$(CC) $^ -o $@
+	@ echo ' '
 	@ echo 'Finished building binary: $@'
 	@ echo ' '
 
 ./objects/%.o: ./source/%.c ./source/%.h
+	@ echo ' '
 	@ echo 'Building target using GCC compiler: $<'
 	$(CC) $< $(CC_FLAGS) -o $@
 	@ echo ' '
@@ -58,20 +64,18 @@ $(PROJECT_NAME): $(OBJ)
 objFolder:
 	@ mkdir -p objects
 
+$(OBJ_DIRS):
+	@ mkdir -p ./objects/$@
+
 clean:
-	@ $(RM) ./objects/*.o $(PROJECT_NAME) *~
-	@ rmdir objects
+	@ $(RM) ./objects/ $(PROJECT_NAME) *~
 
 organize:
 	@ mkdir -p source/
-	@ [ -f *.c ] && mv *.c source/
-	@ [ -f *.h ] && mv *.h source/
+	@ $(shell ls | grep -v Makefile | grep -v source | xargs -I{} mv ./{} ./source)
 	@ echo 'Organized project. You can now compile it.'
 
 run: $(PROJECT_NAME)
 	./$(PROJECT_NAME)
 
 .PHONY: all clean
-
-
-
