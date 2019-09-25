@@ -1,7 +1,7 @@
 #ifndef MULTI_USER_SOCKETS_CHAT_LIST_H
 #define MULTI_USER_SOCKETS_CHAT_LIST_H
 
-#include "../message.h"
+#include "../message/message.h"
 
 typedef struct tList List;
 

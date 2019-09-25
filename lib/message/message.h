@@ -7,11 +7,11 @@
 #define TRUE 1
 #define FALSE 0
 
+#include <time.h>
+
 enum MESSAGE_TYPE {
     PRESENTATION_TYPE, NORMAL_TYPE, TERMINATE_TYPE
 };
-
-#include <time.h>
 
 struct Message {
     char sender[MAX_SENDER_SIZE];   /* sender of text */

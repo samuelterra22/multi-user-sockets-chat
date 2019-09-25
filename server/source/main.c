@@ -17,7 +17,7 @@
 
 #define PORT 8080
 
-#include "../../lib/message.h"
+#include "../../lib/message/message.h"
 #include "../../lib/list/list.h"
 
 int main() {

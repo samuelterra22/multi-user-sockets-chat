@@ -1,16 +1,36 @@
+/******************************************************************************
+ * List implementation                                                        *
+ *                                                                            *
+ * File:    list.c                                                            *
+ * Author:  Samuel Terra Vieira                                               *
+ * Address: Universidade Federal de Lavras                                    *
+ * Date:    Nov/2019                                                          *
+ *****************************************************************************/
 #include "list.h"
 
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../message.h"
+#include "../message/message.h"
 
+/****************************************************
+ * Struct List
+ ***************************************************/
 struct tList {
     struct Message message;
     struct tList *next;
 };
 
+/****************************************************
+ * Método responsável por inserir uma mensagem na
+ * lista de conversas.
+ *
+ * @param p Ponteiro de ponteiro para a lista.
+ * @param message Mensagem a ser inserida na lista.
+ *
+ * @return void
+ ***************************************************/
 void insert_list(List **p, struct Message message) {
     List *current, *new, *previous;
 
@@ -34,6 +54,14 @@ void insert_list(List **p, struct Message message) {
     }
 }
 
+/****************************************************
+ * Método responsável por imprimir a lista de
+ * conversas.
+ *
+ * @param p Ponteiro para a lista.
+ *
+ * @return void
+ ***************************************************/
 void print_list(List *p) {
     while (p != NULL) {
         printf("[%d:%d:%d, %d/%d/%d] %s %s \n",
@@ -44,6 +72,14 @@ void print_list(List *p) {
     }
 }
 
+/****************************************************
+ * Método responsável por remover todos os elementos
+ * da lista.→
+ *
+ * @param p Ponteiro para a lista.
+ *
+ * @return void
+ ***************************************************/
 void *destroy_list(List *l) {
     List *p = l;
     while (p != NULL) {
@@ -54,6 +90,15 @@ void *destroy_list(List *l) {
     return NULL;
 }
 
+/****************************************************
+ * Método responsável por buscar um elemento da lista
+ * de acordo com o remetente.
+ *
+ * @param p Ponteiro para a lista.
+ * @param sender Remetente.
+ *
+ * @return List Elemento da lista.
+ ***************************************************/
 List *search_in_list_by_sender(List *list, const char *sender) {
     List *p;
     for (p = list; p != NULL; p = p->next) {
@@ -64,6 +109,15 @@ List *search_in_list_by_sender(List *list, const char *sender) {
     return NULL;
 }
 
+/****************************************************
+ * Método responsável por remover um elemento na
+ * lista
+ *
+ * @param list  Ponteiro para lista.
+ * @param sender  Elemento da lista a ser removido.
+ *
+ * @return Retorna ponteiro para a lista atualizada.
+ ***************************************************/
 List *remove_in_list(List *list, const char *sender) {
     // ponteiro para o elemento anterior
     List *preview = NULL;

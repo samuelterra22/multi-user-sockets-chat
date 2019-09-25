@@ -16,7 +16,7 @@
 #include <netinet/in.h>
 #include <time.h>
 
-#include "../../lib/message.h"
+#include "../../lib/message/message.h"
 
 #define PORT 8080
 
