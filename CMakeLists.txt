@@ -4,4 +4,4 @@ project(multi-user-sockets-chat C)
 set(CMAKE_C_STANDARD 99)
 
 ## Use onde IDE !!
-add_executable(multi-user-sockets-chat server/source/main.c client/source/main.c server/source/list/list.c)
+add_executable(multi-user-sockets-chat server/source/main.c client/source/main.c lib/list/list.c)

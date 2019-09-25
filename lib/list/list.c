@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../../../lib/message.h"
+#include "../message.h"
 
 struct tList {
     struct Message message;

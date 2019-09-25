@@ -18,7 +18,7 @@
 #define PORT 8080
 
 #include "../../lib/message.h"
-#include "list/list.h"
+#include "../../lib/list/list.h"
 
 int main() {
     int sock_fd;
