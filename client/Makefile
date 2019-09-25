@@ -9,17 +9,17 @@
 #################################################################
 SHELL:=/bin/bash
 
-# The project name. JUST CHANGE THIS :)
+# The project name
 PROJECT_NAME=client
 
 # Object directories recursive
-OBJ_DIRS=$(shell find ./source/ -type d | cut -c 10- | tail -n+2)
+OBJ_DIRS=$(shell find ./source/ ../lib/ -type d | cut -c 10- | tail -n+2)
 
 # .c folder with files
-C_SOURCE=$(shell find ./source/ -type f -name '*.c')
+C_SOURCE=$(shell find ./source/ ../lib/ -type f -name '*.c')
 
 # .h folder with files
-H_SOURCE=$(shell find ./source/ -type f -name '*.h')
+H_SOURCE=$(shell find ./source/ ../lib/ -type f -name '*.h')
 
 # Object files
 OBJ=$(subst .c,.o,$(subst source,objects,$(C_SOURCE)))
@@ -69,6 +69,7 @@ $(OBJ_DIRS):
 
 clean:
 	@ $(RM) ./objects/ $(PROJECT_NAME) *~
+	@ $(shell find ../lib/ -name "*.o" -type f -delete)
 
 organize:
 	@ mkdir -p source/
