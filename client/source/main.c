@@ -46,6 +46,19 @@ void *listen_server(void *arguments) {
 	}
 }
 
+void initialize_threads(int sock_fd, struct sockaddr_in serve_addr) {
+	arg *arguments = malloc(sizeof(arg));
+	arguments->sock_fd = sock_fd;
+	arguments->serve_addr = serve_addr;
+
+	pthread_t thread_id;
+
+	if (pthread_create(&thread_id, NULL, listen_server, (void *) arguments) != 0) {
+		printf("Thread not created.\n");
+		exit(0);
+	}
+}
+
 /******************************************************************************
  * Main client function
  *****************************************************************************/
@@ -84,18 +97,8 @@ int main(int argc, char *argv[]) {
 	/* show message history received from server */
 	show_history(sock_fd, serve_addr);
 
-	// -------------------------------------------------------------------------------------
-	arg *arguments = malloc(sizeof(arg));
-	arguments->sock_fd = sock_fd;
-	arguments->serve_addr = serve_addr;
-
-	pthread_t thread_id;
-
-	if (pthread_create(&thread_id, NULL, listen_server, (void *) arguments) != 0) {
-		printf("Thread not created.\n");
-		exit(0);
-	}
-	// -------------------------------------------------------------------------------------
+	/* initialize thread to listen messages from server */
+	initialize_threads(sock_fd, serve_addr);
 
 	while (!close_connection) {
 		/* read text from terminal */
