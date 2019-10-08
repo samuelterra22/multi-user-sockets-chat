@@ -3,7 +3,7 @@
 
 #include <time.h>
 
-#include "contants.h"
+#include "constants.h"
 
 enum MESSAGE_TYPE {
 	PRESENTATION_TYPE, NORMAL_TYPE, TERMINATE_TYPE, HISTORY_TYPE, END_HISTORY
