@@ -29,21 +29,14 @@
 int main(int argc, char *argv[]) {
 	int sock_fd;
 	struct sockaddr_in serve_addr;
-	char text[MAX_MESSAGE_SIZE] = "vaca preta";
+	char text[MAX_MESSAGE_SIZE] = "";
 	char sender_name[MAX_SENDER_SIZE];
 	int close_connection = FALSE;
 
 	/* Creating socket file descriptor */
-	if ((sock_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+	if ((sock_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		perror("socket creation failed");
 		exit(EXIT_FAILURE);
-	}
-
-	int broadcastPermission = 1;
-	if (setsockopt(sock_fd, SOL_SOCKET, SO_BROADCAST, (void *) &broadcastPermission,
-				   sizeof(broadcastPermission)) < 0) {
-		printf("Erro\n");
-		exit(1);
 	}
 
 	/* fill memory with a constant byte to server_addr */
@@ -52,7 +45,7 @@ int main(int argc, char *argv[]) {
 	/* Filling server information */
 	serve_addr.sin_family = AF_INET;
 	serve_addr.sin_port = htons(PORT);
-	serve_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	serve_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	/* get sender name */
 	printf("Informe seu nome: ");
@@ -63,28 +56,7 @@ int main(int argc, char *argv[]) {
 	printf("Digite \"exit\" para sair ou CTRL+C para fechar o programa.\n\n");
 
 	/* inform the server to send presentation message */
-	//	send_presentation_message(sender_name, sock_fd, serve_addr);
-
-	// ---------------------------------
-
-//	struct Message *message = malloc(sizeof(struct Message));
-//	recvfrom(sock_fd, message, sizeof(*message), 0, NULL, 0);
-//	printf("recebido do servidor\n");
-	if (bind(sock_fd, (struct sockaddr *) &serve_addr, sizeof(serve_addr)) < 0) {
-		printf("Erro\n");
-		exit(1);
-	}
-
-	struct Message message;
-	message.type = NORMAL_TYPE;
-	strcpy(message.sender, sender_name);
-	strcpy(message.text, text);
-
-	sendto(sock_fd, (struct Message *) &message, sizeof(message), 0,
-		   (const struct sockaddr *) &serve_addr, sizeof(serve_addr));
-	printf("enviado");
-	// ---------------------------------
-
+	send_presentation_message(sender_name, sock_fd, serve_addr);
 
 	/* show message history received from server */
 	show_history(sock_fd, serve_addr);
