@@ -4,98 +4,114 @@
  * File:    main.c                                                            *
  * Author:  Samuel Terra Vieira                                               *
  * Address: Universidade Federal de Lavras                                    *
- * Date:    Nov/2019                                                          *
+ * Date:    Out/2019                                                          *
  *****************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
+#include <stdio.h>      /* for printf() and fprintf() */
+#include <sys/socket.h> /* for socket() and bind() */
+#include <arpa/inet.h>  /* for sockaddr_in */
+#include <stdlib.h>     /* for atoi() and exit() */
+#include <string.h>     /* for memset() */
+#include <unistd.h>     /* for close() */
 #include <sys/socket.h>
-#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include "../../lib/message/message.h"
 
+/* Socket port */
 #define PORT 8080
 
-void send_message(struct Message message, int sock_fd, struct sockaddr_in serve_addr) {
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    message.tm = tm;
 
-    sendto(sock_fd, (struct Message *) &message, sizeof(message), MSG_CONFIRM,
-           (const struct sockaddr *) &serve_addr, sizeof(serve_addr));
-}
+/******************************************************************************
+ * Main client function
+ *****************************************************************************/
+int main(int argc, char *argv[]) {
+	int sock_fd;
+	struct sockaddr_in serve_addr;
+	char text[MAX_MESSAGE_SIZE] = "vaca preta";
+	char sender_name[MAX_SENDER_SIZE];
+	int close_connection = FALSE;
 
-void mount_and_send_message(char *sender_name, char *text, enum MESSAGE_TYPE type,
-                            int sock_fd, struct sockaddr_in serve_addr) {
-    struct Message presentation_message;
-    presentation_message.type = type;
-    strcpy(presentation_message.sender, sender_name);
-    strcpy(presentation_message.text, text);
-    send_message(presentation_message, sock_fd, serve_addr);
-}
+	/* Creating socket file descriptor */
+	if ((sock_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+		perror("socket creation failed");
+		exit(EXIT_FAILURE);
+	}
 
-void send_presentation_message(char *sender_name, int sock_fd, struct sockaddr_in serve_addr) {
-    mount_and_send_message(sender_name, "acabou de entrar na conversa", PRESENTATION_TYPE, sock_fd, serve_addr);
-}
+	int broadcastPermission = 1;
+	if (setsockopt(sock_fd, SOL_SOCKET, SO_BROADCAST, (void *) &broadcastPermission,
+				   sizeof(broadcastPermission)) < 0) {
+		printf("Erro\n");
+		exit(1);
+	}
 
-void send_terminate_message(char *sender_name, int sock_fd, struct sockaddr_in serve_addr) {
-    mount_and_send_message(sender_name, "saiu da conversa", TERMINATE_TYPE, sock_fd, serve_addr);
-}
+	/* fill memory with a constant byte to server_addr */
+	memset(&serve_addr, 0, sizeof(serve_addr));
 
-void send_normal_message(char *sender_name, char *text, int sock_fd, struct sockaddr_in serve_addr) {
-    mount_and_send_message(sender_name, text, NORMAL_TYPE, sock_fd, serve_addr);
-}
+	/* Filling server information */
+	serve_addr.sin_family = AF_INET;
+	serve_addr.sin_port = htons(PORT);
+	serve_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-int main() {
-    int sock_fd;
-    struct sockaddr_in serve_addr;
-    char text[MAX_MESSAGE_SIZE] = "";
-    char sender_name[MAX_SENDER_SIZE];
-    int close_connection = FALSE;
+	/* get sender name */
+	printf("Informe seu nome: ");
+	fgets(sender_name, MAX_SENDER_SIZE, stdin);
+	sender_name[strlen(sender_name) - 1] = '\0';
 
-    /* Creating socket file descriptor */
-    if ((sock_fd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-        perror("socket creation failed");
-        exit(0);
-    }
+	printf("Você entrou na conversa.\n");
+	printf("Digite \"exit\" para sair ou CTRL+C para fechar o programa.\n\n");
 
-    memset(&serve_addr, 0, sizeof(serve_addr));
+	/* inform the server to send presentation message */
+	//	send_presentation_message(sender_name, sock_fd, serve_addr);
 
-    /* Filling server information */
-    serve_addr.sin_family = AF_INET;
-    serve_addr.sin_port = htons(PORT);
-    serve_addr.sin_addr.s_addr = INADDR_ANY;
+	// ---------------------------------
 
-    printf("Informe seu nome: ");
-    fgets(sender_name, MAX_SENDER_SIZE, stdin);
-    sender_name[strlen(sender_name) - 1] = '\0';
+//	struct Message *message = malloc(sizeof(struct Message));
+//	recvfrom(sock_fd, message, sizeof(*message), 0, NULL, 0);
+//	printf("recebido do servidor\n");
+	if (bind(sock_fd, (struct sockaddr *) &serve_addr, sizeof(serve_addr)) < 0) {
+		printf("Erro\n");
+		exit(1);
+	}
 
-    printf("Você entrou na conversa.\n");
-    printf("Digite \"exit\" para sair ou CTRL+C para fechar o programa.\n");
+	struct Message message;
+	message.type = NORMAL_TYPE;
+	strcpy(message.sender, sender_name);
+	strcpy(message.text, text);
 
-    send_presentation_message(sender_name, sock_fd, serve_addr);
+	sendto(sock_fd, (struct Message *) &message, sizeof(message), 0,
+		   (const struct sockaddr *) &serve_addr, sizeof(serve_addr));
+	printf("enviado");
+	// ---------------------------------
 
-    while (!close_connection) {
 
-        printf("> ");
-        fgets(text, MAX_MESSAGE_SIZE, stdin);
-        text[strlen(text) - 1] = '\0';
+	/* show message history received from server */
+	show_history(sock_fd, serve_addr);
 
-        if (!strcmp(text, "exit")) {
-            send_terminate_message(sender_name, sock_fd, serve_addr);
+	while (!close_connection) {
 
-            close_connection = TRUE;
-            printf("Você saiu da conversa.\n");
-            printf("God bye!\n");
-        } else {
-            send_normal_message(sender_name, text, sock_fd, serve_addr);
-        }
-    }
+		/* read text from terminal */
+		printf("> ");
+		fgets(text, MAX_MESSAGE_SIZE, stdin);
+		text[strlen(text) - 1] = '\0';
 
-    close(sock_fd);
-    return EXIT_SUCCESS;
+		if (!strcmp(text, "exit")) {
+			/* inform the server that client will make exit from chat */
+			send_terminate_message(sender_name, sock_fd, serve_addr);
+
+			/* brake main while connection */
+			close_connection = TRUE;
+			printf("Você saiu da conversa.\n");
+			printf("God bye!\n");
+		} else {
+			/* send message read from terminal */
+			send_normal_message(sender_name, text, sock_fd, serve_addr);
+		}
+	}
+
+	/* close communication socket */
+	close(sock_fd);
+
+	return EXIT_SUCCESS;
 }

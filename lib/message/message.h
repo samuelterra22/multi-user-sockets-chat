@@ -1,23 +1,49 @@
 #ifndef MULTI_USER_SOCKETS_CHAT_MESSAGE_H
 #define MULTI_USER_SOCKETS_CHAT_MESSAGE_H
 
-#define MAX_MESSAGE_SIZE 200
-#define MAX_SENDER_SIZE 20
+#include <netinet/in.h>
 
-#define TRUE 1
-#define FALSE 0
+#include "../structs.h"
 
-#include <time.h>
+/******************************************************************************
+ * Send mounted message.
+ *****************************************************************************/
+void send_message(struct Message message, int sock_fd, struct sockaddr_in serve_addr);
 
-enum MESSAGE_TYPE {
-    PRESENTATION_TYPE, NORMAL_TYPE, TERMINATE_TYPE
-};
+/******************************************************************************
+ * Mount message using attribute values.
+ *****************************************************************************/
+void mount_and_send_message(char *sender_name, char *text, enum MESSAGE_TYPE type,
+							int sock_fd, struct sockaddr_in serve_addr);
 
-struct Message {
-    char sender[MAX_SENDER_SIZE];   /* sender of text */
-    char text[MAX_MESSAGE_SIZE];    /* text text */
-    struct tm tm;                   /* date value */
-    enum MESSAGE_TYPE type;         /* message type */
-};
+/******************************************************************************
+ * Send presentation message for server with flag PRESENTATION_TYPE.
+ *****************************************************************************/
+void send_presentation_message(char *sender_name, int sock_fd, struct sockaddr_in serve_addr);
+
+/******************************************************************************
+ * Send terminate message for server with flag TERMINATE_TYPE.
+ *****************************************************************************/
+void send_terminate_message(char *sender_name, int sock_fd, struct sockaddr_in serve_addr);
+
+/******************************************************************************
+ * Send a normal message for server with flag NORMAL_TYPE.
+ *****************************************************************************/
+void send_normal_message(char *sender_name, char *text, int sock_fd, struct sockaddr_in serve_addr);
+
+/******************************************************************************
+ * Print a message
+ *****************************************************************************/
+void print_message(struct Message *message);
+
+/******************************************************************************
+ * Show message history received from server
+ *****************************************************************************/
+void show_history(int sock_fd, struct sockaddr_in serve_addr);
+
+/******************************************************************************
+ * Send message list for client
+ *****************************************************************************/
+void send_history(int sock_fd, struct sockaddr_in cli_addr, List *p);
 
 #endif //MULTI_USER_SOCKETS_CHAT_MESSAGE_H

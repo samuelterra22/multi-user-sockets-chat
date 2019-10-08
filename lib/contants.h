@@ -1,0 +1,14 @@
+//
+// Created by samuel on 08/10/2019.
+//
+
+#ifndef MULTI_USER_SOCKETS_CHAT_CONTANTS_H
+#define MULTI_USER_SOCKETS_CHAT_CONTANTS_H
+
+#define MAX_MESSAGE_SIZE 200
+#define MAX_SENDER_SIZE 20
+
+#define TRUE 1
+#define FALSE 0
+
+#endif //MULTI_USER_SOCKETS_CHAT_CONTANTS_H

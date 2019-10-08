@@ -5,6 +5,6 @@
 #################################################################
 
 # The project name
-PROJECT_NAME=client
+PROJECT_NAME=server
 
 include ../Makefile.mk
