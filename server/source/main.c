@@ -60,11 +60,16 @@ int main(int argc, char *argv[]) {
 		if (message->type == PRESENTATION_TYPE) {
 			printf("%s se conectou\n", message->sender);
 
-			/* sent history for new client */
+			// sent history for new client
 			send_history(sock_fd, cli_addr, messages_history);
 		} else if (message->type == TERMINATE_TYPE) {
 			printf("%s se desconectou\n", message->sender);
+		} else {
+			printf("bla\n");
+			sendto(sock_fd, (struct Message *) message, sizeof(struct Message),
+				   MSG_CONFIRM, (const struct sockaddr *) &cli_addr, sizeof(cli_addr));
 		}
+
 	}
 }
 

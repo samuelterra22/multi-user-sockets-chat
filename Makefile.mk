@@ -42,7 +42,7 @@ all: objFolder $(OBJ_DIRS) $(PROJECT_NAME)
 
 $(PROJECT_NAME): $(OBJ)
 	@ echo 'Building binary using GCC linker: $@'
-	$(CC) $^ -o $@
+	$(CC) $^ $(CC_EXTRA_LIB_FLAGS) -o $@
 	@ echo ' '
 	@ echo 'Finished building binary: $@'
 	@ echo ' '

@@ -8,3 +8,5 @@
 PROJECT_NAME=client
 
 include ../Makefile.mk
+
+CC_EXTRA_LIB_FLAGS=-lpthread
