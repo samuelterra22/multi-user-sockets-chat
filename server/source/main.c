@@ -6,12 +6,11 @@
  * Address: Universidade Federal de Lavras                                    *
  * Date:    Out/2019                                                          *
  *****************************************************************************/
-#include <stdio.h>      /* for printf() and fprintf() */
-#include <sys/socket.h> /* for socket() and bind() */
-#include <arpa/inet.h>  /* for sockaddr_in */
-#include <stdlib.h>     /* for atoi() and exit() */
-#include <string.h>     /* for memset() */
-#include <unistd.h>     /* for close() */
+#include <stdio.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
+#include <string.h>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
@@ -65,7 +64,6 @@ int main(int argc, char *argv[]) {
 		} else if (message->type == TERMINATE_TYPE) {
 			printf("%s se desconectou\n", message->sender);
 		} else {
-			printf("bla\n");
 			sendto(sock_fd, (struct Message *) message, sizeof(struct Message),
 				   MSG_CONFIRM, (const struct sockaddr *) &cli_addr, sizeof(cli_addr));
 		}
