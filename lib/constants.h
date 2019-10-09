@@ -8,6 +8,8 @@
 #define MAX_MESSAGE_SIZE 200
 #define MAX_SENDER_SIZE 20
 
+#define MAX_CLIENTS 100
+
 #define TRUE 1
 #define FALSE 0
 
