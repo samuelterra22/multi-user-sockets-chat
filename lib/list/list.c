@@ -1,5 +1,5 @@
 /******************************************************************************
- * List implementation                                                        *
+ * Implementação de uma lista de mensagens                                    *
  *                                                                            *
  * File:    list.c                                                            *
  * Author:  Samuel Terra Vieira                                               *
@@ -78,7 +78,7 @@ void *destroy_list(List *l) {
 }
 
 /******************************************************************************
- * Método responsável por buscar um elemento da lista de acordo com o remetente.
+ * Função responsável por buscar um elemento da lista de acordo com o remetente.
  *
  * @param p Ponteiro para a lista.
  * @param sender Remetente.

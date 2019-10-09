@@ -44,6 +44,6 @@ void show_history(int sock_fd, struct sockaddr_in serve_addr);
 /******************************************************************************
  * Send message list for client
  *****************************************************************************/
-void send_history(int sock_fd, struct sockaddr_in cli_addr, List *p);
+void send_history(int sock_fd, struct sockaddr_in cli_addr, List *list);
 
 #endif //MULTI_USER_SOCKETS_CHAT_MESSAGE_H

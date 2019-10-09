@@ -1,3 +1,11 @@
+/******************************************************************************
+ * Implementação do gerenciamento de mensagens			                      *
+ *                                                                            *
+ * File:    message.c                                                         *
+ * Author:  Samuel Terra Vieira                                               *
+ * Address: Universidade Federal de Lavras                                    *
+ * Date:    Out/2019                                                          *
+ *****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -9,6 +17,12 @@
 
 /******************************************************************************
  * Send mounted message.
+ *
+ * @param	message
+ * @param	sock_fd
+ * @param	serve_addr
+ *
+ * @return	void
  *****************************************************************************/
 void send_message(struct Message message, int sock_fd, struct sockaddr_in serve_addr) {
 	time_t t = time(NULL);
@@ -21,6 +35,14 @@ void send_message(struct Message message, int sock_fd, struct sockaddr_in serve_
 
 /******************************************************************************
  * Mount message using attribute values.
+ *
+ * @param	sender_name
+ * @param	text
+ * @param	type
+ * @param	sock_fd
+ * @param	serve_addr
+ *
+ * @return	void
  *****************************************************************************/
 void mount_and_send_message(char *sender_name, char *text, enum MESSAGE_TYPE type,
 							int sock_fd, struct sockaddr_in serve_addr) {
@@ -33,6 +55,12 @@ void mount_and_send_message(char *sender_name, char *text, enum MESSAGE_TYPE typ
 
 /******************************************************************************
  * Send presentation message for server with flag PRESENTATION_TYPE.
+ *
+ * @param	sender_name
+ * @param	sock_fd
+ * @param	serve_addr
+ *
+ * @return	void
  *****************************************************************************/
 void send_presentation_message(char *sender_name, int sock_fd, struct sockaddr_in serve_addr) {
 	mount_and_send_message(sender_name, "acabou de entrar na conversa", PRESENTATION_TYPE, sock_fd, serve_addr);
@@ -40,6 +68,12 @@ void send_presentation_message(char *sender_name, int sock_fd, struct sockaddr_i
 
 /******************************************************************************
  * Send terminate message for server with flag TERMINATE_TYPE.
+ *
+ * @param	sender_name
+ * @param	sock_fd
+ * @param	serve_addr
+ *
+ * @return	void
  *****************************************************************************/
 void send_terminate_message(char *sender_name, int sock_fd, struct sockaddr_in serve_addr) {
 	mount_and_send_message(sender_name, "saiu da conversa", TERMINATE_TYPE, sock_fd, serve_addr);
@@ -47,6 +81,13 @@ void send_terminate_message(char *sender_name, int sock_fd, struct sockaddr_in s
 
 /******************************************************************************
  * Send a normal message for server with flag NORMAL_TYPE.
+ *
+ * @param	sender_name
+ * @param	text
+ * @param	sock_fd
+ * @param	serve_addr
+ *
+ * @return	void
  *****************************************************************************/
 void send_normal_message(char *sender_name, char *text, int sock_fd, struct sockaddr_in serve_addr) {
 	mount_and_send_message(sender_name, text, NORMAL_TYPE, sock_fd, serve_addr);
@@ -54,6 +95,10 @@ void send_normal_message(char *sender_name, char *text, int sock_fd, struct sock
 
 /******************************************************************************
  * Print a message
+ *
+ * @param	message
+ *
+ * @return	void
  *****************************************************************************/
 void print_message(struct Message *message) {
 	char *normal_message_format = "[%2d:%2d:%2d, %2d/%2d/%4d] %s: %s \n";
@@ -66,6 +111,11 @@ void print_message(struct Message *message) {
 
 /******************************************************************************
  * Show message history received from server
+ *
+ * @param	sock_fd
+ * @param	serve_addr
+ *
+ * @return	void
  *****************************************************************************/
 void show_history(int sock_fd, struct sockaddr_in serve_addr) {
 	struct Message *message = malloc(sizeof(struct Message));
@@ -81,15 +131,21 @@ void show_history(int sock_fd, struct sockaddr_in serve_addr) {
 
 /******************************************************************************
  * Send message list for client
+ *
+ * @param	sock_fd
+ * @param	cli_addr
+ * @param	list
+ *
+ * @return	void
  *****************************************************************************/
-void send_history(int sock_fd, struct sockaddr_in cli_addr, List *p) {
-	while (p != NULL) {
-		struct Message message = p->message;
+void send_history(int sock_fd, struct sockaddr_in cli_addr, List *list) {
+	while (list != NULL) {
+		struct Message message = list->message;
 		message.type = HISTORY_TYPE;
 
 		sendto(sock_fd, (struct Message *) &message, sizeof(message),
 			   MSG_CONFIRM, (const struct sockaddr *) &cli_addr, sizeof(cli_addr));
-		p = p->next;
+		list = list->next;
 	}
 
 	struct Message message;

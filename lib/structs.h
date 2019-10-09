@@ -1,3 +1,13 @@
+/******************************************************************************
+ * Structs utilizadas no trabalho.					                      	  *
+ * Estratégia utilizada para evitar dependências circulares                   *
+ *                                                                            *
+ * File:    structs.c                                                         *
+ * Author:  Samuel Terra Vieira                                               *
+ * Address: Universidade Federal de Lavras                                    *
+ * Date:    Out/2019                                                          *
+ *****************************************************************************/
+
 #ifndef MULTI_USER_SOCKETS_CHAT_STRUCTS_H
 #define MULTI_USER_SOCKETS_CHAT_STRUCTS_H
 
@@ -17,8 +27,8 @@ struct Message {
 };
 
 struct tList {
-	struct Message message;
-	struct tList *next;
+	struct Message message;            /* message sent */
+	struct tList *next;                /* pointer to next node */
 };
 
 typedef struct tList List;

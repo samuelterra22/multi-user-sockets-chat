@@ -20,17 +20,27 @@
 
 #include "../../lib/message/message.h"
 
-/* Socket port */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
+
+/* Socket port */
 #define PORT 8080
 
+/******************************************************************************
+ * Struct de arumento da thread.
+ *****************************************************************************/
 typedef struct {
 	int sock_fd;
 	struct sockaddr_in serve_addr;
 } arg;
 
-
+/******************************************************************************
+ * Método thread.
+ *
+ * @param	arguments	Argumentos da thread.
+ *
+ * @return	void
+ *****************************************************************************/
 void *listen_server(void *arguments) {
 	arg *args = (arg *) arguments;
 
@@ -46,6 +56,15 @@ void *listen_server(void *arguments) {
 	}
 }
 
+/******************************************************************************
+ * Método responsável por disparar a thread de ficar ouvindo as respostas do
+ * servidor.
+ *
+ * @param	sock_fd
+ * @param	serve_addr
+ *
+ * @return	void
+ *****************************************************************************/
 void initialize_threads(int sock_fd, struct sockaddr_in serve_addr) {
 	arg *arguments = malloc(sizeof(arg));
 	arguments->sock_fd = sock_fd;
@@ -60,7 +79,12 @@ void initialize_threads(int sock_fd, struct sockaddr_in serve_addr) {
 }
 
 /******************************************************************************
- * Main client function
+ * Função principal do cliente.
+ *
+ * @param	argc
+ * @param	argv
+ *
+ * @return	Status de saída do progama.
  *****************************************************************************/
 int main(int argc, char *argv[]) {
 	int sock_fd;
@@ -100,6 +124,7 @@ int main(int argc, char *argv[]) {
 	/* initialize thread to listen messages from server */
 	initialize_threads(sock_fd, serve_addr);
 
+	/* main application loop */
 	while (!close_connection) {
 		/* read text from terminal */
 		printf("> ");

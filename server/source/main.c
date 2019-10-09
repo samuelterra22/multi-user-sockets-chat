@@ -22,11 +22,22 @@
 #include "../../lib/list/list.h"
 #include "../../lib/client/client.h"
 
+/******************************************************************************
+ * Função principal do servidor.
+ *
+ * @param	argc
+ * @param	argv
+ *
+ * @return	Status de saída do progama.
+ *****************************************************************************/
 int main(int argc, char *argv[]) {
 	int sock_fd;
 	struct sockaddr_in serve_addr, cli_addr;
 
+	/* Message to send */
 	struct Message *message = malloc(sizeof(struct Message));
+
+	/* List for store history chat */
 	List *messages_history = init_list();
 
 	/* Creating socket file descriptor */
@@ -35,6 +46,7 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	/* Set zeros in serve_addr and cli_addr */
 	memset(&serve_addr, 0, sizeof(serve_addr));
 	memset(&cli_addr, 0, sizeof(cli_addr));
 
@@ -51,16 +63,19 @@ int main(int argc, char *argv[]) {
 
 	printf("Servidor pronto para receber mensagens.\n\n");
 
+	/* main application loop */
 	while (TRUE) {
 		unsigned int len = sizeof(cli_addr);
+		/* wait client connect */
 		recvfrom(sock_fd, message, sizeof(*message), MSG_WAITALL, (struct sockaddr *) &cli_addr, &len);
 
 		if (message->type == PRESENTATION_TYPE) {
 			printf("%s se conectou\n", message->sender);
 
-			// sent history for new client
+			/* sent history for new client */
 			send_history(sock_fd, cli_addr, messages_history);
 		} else if (message->type == TERMINATE_TYPE) {
+			/* remove client from list of clients */
 			remove_client_address(cli_addr);
 			printf("%s se desconectou\n", message->sender);
 		}
